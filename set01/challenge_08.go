@@ -7,22 +7,29 @@ import (
 
 // DetectAesInEcbMode - find (but don't do anything with)
 // the single ciphertext that has been encrypted with AES-128-ECB
-func DetectAesInEcbMode(hexLines [][]byte) map[string]int {
+func DetectAesInEcbMode(hexLines [][]byte) int {
 	blockSize := 16
-	ecbs := make(map[string]int)
 	lines := getBytesFromHexStrings(hexLines)
 	for i, line := range lines {
-		found := make(map[string]bool)
-		// ecb was used if there are any repeating blocks
-		blocks := splitLineIntoBlocks(line, blockSize)
-		for _, block := range blocks {
-			if found[string(block)] {
-				ecbs[string(line)] = i + 1
-			}
-			found[string(block)] = true
+		if IsEcb(line, blockSize) {
+			return i
 		}
 	}
-	return ecbs
+	return -1
+}
+
+// IsEcb - is the given input (with given blocksize) encrypted with ECB or not?
+func IsEcb(line []byte, blockSize int) bool {
+	found := make(map[string]bool)
+	// ecb was used if there are any repeating blocks
+	blocks := splitLineIntoBlocks(line, blockSize)
+	for _, block := range blocks {
+		if found[string(block)] {
+			return true
+		}
+		found[string(block)] = true
+	}
+	return false
 }
 
 func getBytesFromHexStrings(hexLines [][]byte) [][]byte {

@@ -2,7 +2,9 @@ package util
 
 import (
 	"bufio"
+	"crypto/rand"
 	"log"
+	"math/big"
 	"os"
 )
 
@@ -65,4 +67,23 @@ func GetLinesFromFile(filename string) [][]byte {
 		result = append(result, []byte(scanner.Text()))
 	}
 	return result
+}
+
+// GetRandomBytes - return a byte array containing random numbers (crypto/rand)
+func GetRandomBytes(l int) []byte {
+	b := make([]byte, l)
+	_, err := rand.Read(b)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return b
+}
+
+// GetRandomInt -- return a random integer (crypto/rand)
+func GetRandomInt(m int) int {
+	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(m)))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return int(nBig.Int64())
 }
